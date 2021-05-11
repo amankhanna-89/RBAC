@@ -1,6 +1,6 @@
 import rsa
 
-admin_email = 'a'
+admin_email = 'admin@bluestacks.com'
 admin_password = 'adminpw'
 
 user_email = 'aman@ok.com'
