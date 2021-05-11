@@ -419,7 +419,7 @@ class User(object):
     @classmethod
     def change_password(cls, user, new_password):
         UserDict[user.email] = UserData(user.username, new_password, user.is_staff, user.email, False, user.role_list)
-        return
+        return UserDict[user.email]
 
 
 class AuthorizedUser:
@@ -682,7 +682,9 @@ class AuthorizedUser:
         if input_selection == 19:
             User.view_assigned_roles(user)
         if input_selection == 20:
-            User.change_password(user)
+            new_password = rsa.encrypt(getpass.getpass(prompt="New Password:").encode(), publicKey)
+
+            User.change_password(user, new_password)
             logout = True
         if input_selection == 21:
             logout = True
@@ -746,8 +748,14 @@ def main():
                 password = rsa.encrypt(getpass.getpass().encode(), publicKey)
                 # 1) User Log-in
                 user = AuthorizedUser.get_user(email, password)
-                if user is not None:
+                if user is not None and user.password_change_required:
+                    new_password = rsa.encrypt(getpass.getpass(prompt="New Password:").encode(), publicKey)
+                    User.change_password(user, new_password)
+                    print("Login again with new password !!!")
+                    logout = True
+                elif user is not None:
                     logout = False
+
             # 2) Menu show up
             AuthorizedUser.menu(user)
             input_selection = int(input('Specify your selection:'))

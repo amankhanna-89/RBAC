@@ -48,9 +48,26 @@ class TestUserOperation(unittest.TestCase):
         self.assertEqual(rbac.User.get_all_users(), [admin_email, user_email])
 
         # create_user(cls, username, password, is_staff, email, password_change_required, role_list=[]):
-        rbac.User.create_user('user2', 'user2pw', True, 'user2@ok.com', False, [])
+        password = rsa.encrypt('user2pw'.encode(), publicKey)
+        rbac.User.create_user('user2', password, True, 'user2@ok.com', False, [])
 
         self.assertEqual(rbac.User.get_all_users(), [admin_email, user_email, 'user2@ok.com'])
+
+        rbac.clean_up()
+
+    def test_changepassword(self):
+        rbac.setup()
+
+        self.assertEqual(rbac.User.get_all_users(), [admin_email, user_email])
+
+        # create_user(cls, username, password, is_staff, email, password_change_required, role_list=[]):
+        password = rsa.encrypt('user3pw'.encode(), publicKey)
+        user = rbac.User.create_user('user3', password, False, 'user3@ok.com', False, [])
+
+        new_password = rsa.encrypt('user3pwnew'.encode(), publicKey)
+        user_password_changed = rbac.User.change_password(user, new_password)
+
+        self.assertEqual(rsa.decrypt(user_password_changed.password, privateKey).decode(), 'user3pwnew')
 
         rbac.clean_up()
 
