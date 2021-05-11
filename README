@@ -1,0 +1,14 @@
+# Create Virtual env
+
+Virtual env is required to resolve(install) dependent packages.Type below command
+
+`make venv`
+
+# To Run Code
+
+'make run'
+
+# To Run Test Cases
+
+`make test`
+
